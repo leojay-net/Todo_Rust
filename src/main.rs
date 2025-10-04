@@ -7,7 +7,7 @@ struct Todo {
 }
 
 impl Todo {
-    fn create(id:usize, title: String, description: String) -> Self {
+    fn create(id: usize, title: String, description: String) -> Self {
         Todo {
             id,
             title,
@@ -48,7 +48,9 @@ impl TodoList {
     }
 
     fn add_todo(&mut self, title: String, description: String) -> usize {
-        self.todos.push(todo);
+        let id = self.next_id;
+        let new_todo = Todo::create(id, title, description);
+        self.todos.push(new_todo);
         self.next_id += 1;
         println!("Added todo #{}: {}", id, self.todos.last().unwrap().title);
         id
@@ -62,7 +64,12 @@ impl TodoList {
         self.todos.iter_mut().find(|todo| todo.id == id)
     }
 
-    fn update_todo(&mut self, id: usize, title: Option<String>, description: Option<String>) -> bool {
+    fn update_todo(
+        &mut self,
+        id: usize,
+        title: Option<String>,
+        description: Option<String>,
+    ) -> bool {
         if let Some(todo) = self.get_todo_mut(id) {
             todo.update(title, description);
             println!("Updated todo #{}", id);
@@ -98,7 +105,10 @@ impl TodoList {
     fn delete_todo(&mut self, id: usize) -> bool {
         if let Some(index) = self.todos.iter().position(|todo| todo.id == id) {
             let removed_todo = self.todos.remove(index);
-            println!("Deleted todo #{}: '{}'", removed_todo.id, removed_todo.title);
+            println!(
+                "Deleted todo #{}: '{}'",
+                removed_todo.id, removed_todo.title
+            );
             true
         } else {
             println!("Todo with id {} not found", id);
@@ -115,14 +125,17 @@ impl TodoList {
         println!("\n=== Todo List ===");
         for todo in &self.todos {
             let status = if todo.completed { "✓" } else { "○" };
-            println!("{} #{}: {} - {}", status, todo.id, todo.title, todo.description);
+            println!(
+                "{} #{}: {} - {}",
+                status, todo.id, todo.title, todo.description
+            );
         }
         println!("================\n");
     }
 
     fn list_completed(&self) {
         let completed: Vec<&Todo> = self.todos.iter().filter(|todo| todo.completed).collect();
-        
+
         if completed.is_empty() {
             println!("No completed todos!");
             return;
@@ -137,7 +150,7 @@ impl TodoList {
 
     fn list_pending(&self) {
         let pending: Vec<&Todo> = self.todos.iter().filter(|todo| !todo.completed).collect();
-        
+
         if pending.is_empty() {
             println!("No pending todos!");
             return;
@@ -154,7 +167,7 @@ impl TodoList {
         let total = self.todos.len();
         let completed = self.todos.iter().filter(|todo| todo.completed).count();
         let pending = total - completed;
-        
+
         println!("\n=== Todo Statistics ===");
         println!("Total todos: {}", total);
         println!("Completed: {}", completed);
@@ -174,12 +187,12 @@ fn main() {
         "Learn Rust".to_string(),
         "Complete the Rust tutorial".to_string(),
     );
-    
+
     let id2 = todo_list.add_todo(
         "Build a project".to_string(),
         "Create a todo app in Rust".to_string(),
     );
-    
+
     let id3 = todo_list.add_todo(
         "Master Rust".to_string(),
         "Become proficient in Rust programming".to_string(),
@@ -193,7 +206,7 @@ fn main() {
     todo_list.update_todo(
         id3,
         Some("Master Advanced Rust".to_string()),
-        Some("Become expert in advanced Rust concepts".to_string())
+        Some("Become expert in advanced Rust concepts".to_string()),
     );
 
     todo_list.list_todos();
